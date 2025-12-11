@@ -97,6 +97,16 @@ const MatchUpPlay: React.FC = () => {
     return () => clearInterval(t);
   }, [gameId, isGameFinished]);
 
+  // Cleanup AudioContext on unmount
+  useEffect(() => {
+    return () => {
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => { });
+        audioCtxRef.current = null;
+      }
+    };
+  }, []);
+
   const ensureAudio = () => {
     if (!audioCtxRef.current) {
       try {
@@ -198,6 +208,33 @@ const MatchUpPlay: React.FC = () => {
     }
   };
 
+  const handleRestart = () => {
+    if (!game) return;
+
+    setMatches({});
+    setMatchedAnim({});
+    setScore(0);
+    setSecondsLeft(60);
+    setIsGameFinished(false);
+
+    // Reshuffle
+    const words = game.pairs.map((p: any, idx: number) => ({ idx, text: p.word }));
+    const defs = game.pairs.map((p: any, idx: number) => ({ idx, text: p.definition }));
+
+    const shuffleArray = (arr: any[]) => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    };
+
+    shuffleArray(words);
+    shuffleArray(defs);
+
+    setWordsList(words);
+    setDefsList(defs);
+  };
+
   if (loading) return <div className="min-h-screen game-gradient-bg flex items-center justify-center text-white">Loading...</div>;
   if (!game) return <div className="min-h-screen game-gradient-bg flex items-center justify-center text-white">Game tidak ditemukan</div>;
 
@@ -238,7 +275,7 @@ const MatchUpPlay: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              <Button onClick={() => window.location.reload()} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-cyan-500/30">
+              <Button onClick={handleRestart} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-cyan-500/30">
                 <RotateCcw className="mr-2 h-5 w-5" /> Main Lagi
               </Button>
               <Button onClick={() => navigate('/')} variant="outline" className="w-full border-2 border-purple-200 text-purple-700 hover:bg-purple-50 font-bold h-12 rounded-xl">
@@ -260,7 +297,7 @@ const MatchUpPlay: React.FC = () => {
             </div>
             <h2 className="text-3xl font-extrabold text-gray-800 mb-2">Waktu Habis!</h2>
             <p className="text-gray-600 mb-6 font-medium">Jangan menyerah, coba lagi ya!</p>
-            <Button onClick={() => window.location.reload()} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-red-500/30">
+            <Button onClick={handleRestart} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-red-500/30">
               <RotateCcw className="mr-2 h-5 w-5" /> Coba Lagi
             </Button>
             <Button onClick={() => navigate('/')} variant="ghost" className="mt-2 w-full text-gray-400 hover:text-white">
