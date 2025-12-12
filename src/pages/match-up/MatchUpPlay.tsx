@@ -297,6 +297,14 @@ const MatchUpPlay: React.FC = () => {
             </div>
             <h2 className="text-3xl font-extrabold text-gray-800 mb-2">Waktu Habis!</h2>
             <p className="text-gray-600 mb-6 font-medium">Jangan menyerah, coba lagi ya!</p>
+
+            <div className="bg-red-50 p-4 rounded-xl mb-6 flex justify-center items-center border border-red-100">
+              <div className="text-center">
+                <p className="text-xs text-red-400 uppercase font-bold">Skor Akhir</p>
+                <p className="text-3xl font-bold text-red-600">{score}</p>
+              </div>
+            </div>
+
             <Button onClick={handleRestart} className="w-full bg-red-500 hover:bg-red-600 text-white font-bold h-12 rounded-xl text-lg shadow-lg shadow-red-500/30">
               <RotateCcw className="mr-2 h-5 w-5" /> Coba Lagi
             </Button>
